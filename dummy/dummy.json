@@ -1,0 +1,12 @@
+{
+  "status": 200,
+  "type": "OK",
+  "data": {
+    "basicInfo": {
+      "name": "田中 太郎",
+      "dob": "11/11/1998"
+    },
+    "certificate": {},
+    "wishes": {}
+  }
+}
