@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/route_generator.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import './http.dart';
 import 'package:dio/dio.dart';
 
 void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({Key key}) : super(key: key);
 
   static const String _title = 'Flutter Code Sample';
 
@@ -24,7 +21,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MyStatefulWidget extends StatefulWidget {
-  const MyStatefulWidget({Key? key}) : super(key: key);
+  const MyStatefulWidget({Key key}) : super(key: key);
 
   @override
   _MyStatefulWidgetState createState() => _MyStatefulWidgetState();
@@ -236,7 +233,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
 class EnterNamePage extends StatefulWidget {
   final String name;
 
-  const EnterNamePage({Key? key, required this.name}) : super(key: key);
+  const EnterNamePage({Key key, this.name}) : super(key: key);
 
   @override
   _EnterNamePageState createState() => _EnterNamePageState();
@@ -314,7 +311,7 @@ class UserInfo {
   final String name;
 
   UserInfo({
-    required this.name,
+    this.name,
   });
 
   static UserInfo fromJson(dynamic json) {
@@ -329,7 +326,7 @@ class Response {
   final String message;
   final UserInfo data;
 
-  Response({required this.success, required this.message, required this.data});
+  Response({this.success, this.message, this.data});
 
   static Response fromJson(dynamic json) {
     return Response(
