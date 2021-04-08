@@ -75,7 +75,9 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
         length: 3,
         child: Scaffold(
           appBar: AppBar(
-            title: Text("My page"),
+            title: Text("My Page"),
+            leading: GestureDetector(),
+            actions: <Widget>[],
           ),
           body: CustomScrollView(
             physics: const BouncingScrollPhysics(),
