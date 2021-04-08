@@ -4,13 +4,13 @@ import 'package:myapp/main.dart';
 class RouteGenerator {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     final args = settings.arguments;
-
+    print(args);
     switch (settings.name) {
       case '/':
         return MaterialPageRoute(builder: (_) => MyStatefulWidget());
       case 'enter-name':
         if (args is String) {
-          return MaterialPageRoute(builder: (_) => EnterNamePage());
+          return MaterialPageRoute(builder: (_) => EnterNamePage(name: args));
         }
         return _errorRoute();
       default:

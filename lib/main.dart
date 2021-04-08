@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:myapp/route_generator.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import './http.dart';
+import 'package:dio/dio.dart';
 
 void main() => runApp(const MyApp());
 
@@ -30,16 +32,22 @@ class MyStatefulWidget extends StatefulWidget {
 
 class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   int _selectedIndex = 0;
-  String name = '';
-
+  var name = '';
   final nameController = TextEditingController();
   final String url =
-      'http://localhost:8080/api/getUserProfile/606d3c8972a92d4a1c52a20f';
+      'http://10.0.2.2:8080/api/getUserProfile/606e75b35bd58f09ec8453ce';
 
-  Future<dynamic> initData() async {
-    var result = await http.get(Uri.parse(url));
-    print(result.body);
-    return json.decode(result.body)['results'];
+  //fetch data from api
+  void initData() async {
+    final Dio dio = new Dio();
+    try {
+      var response = await dio.get(url);
+      print(response.data['data']['name']);
+      name = response.data['data']['name'];
+      nameController.text = name;
+    } on DioError catch (e) {
+      throw e;
+    }
   }
 
   @override
@@ -50,20 +58,12 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
 
   @override
   void initState() {
-    onNameChange('quang anh');
-    nameController.text = '123';
     super.initState();
     initData();
-  }
-
-  void onNameChange(String value) {
-    setState(() {
-      name = value;
-    });
+    nameController.text = name;
   }
 
   void _onItemTapped(int index) {
-    initData();
     setState(() {
       _selectedIndex = index;
     });
@@ -122,7 +122,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
                           controller: nameController,
                           onTap: () => {
                             Navigator.of(context)
-                                .pushNamed('enter-name', arguments: '123')
+                                .pushNamed('enter-name', arguments: name)
                           },
                         ),
                         TextField(
@@ -232,11 +232,40 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
 }
 
 class EnterNamePage extends StatefulWidget {
+  final String name;
+
+  const EnterNamePage({Key? key, required this.name}) : super(key: key);
+
   @override
   _EnterNamePageState createState() => _EnterNamePageState();
 }
 
 class _EnterNamePageState extends State<EnterNamePage> {
+  final nameEditController = TextEditingController();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    nameEditController.text = widget.name;
+  }
+
+  void onSubmit() async {
+    final Dio dio = new Dio();
+    try {
+      var response =
+          await dio.post(url, data: {"name": nameEditController.text});
+      print(response);
+      // if(response)
+      Navigator.of(context).pushNamed('/');
+    } on DioError catch (e) {
+      throw e;
+    }
+  }
+
+  final String url =
+      'http://10.0.2.2:8080/api/udpateUserProfile/606e75b35bd58f09ec8453ce';
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -257,7 +286,7 @@ class _EnterNamePageState extends State<EnterNamePage> {
               padding: EdgeInsets.only(right: 20.0, top: 15.0),
               child: GestureDetector(
                 onTap: () {
-                  Navigator.of(context).pushNamed('/');
+                  onSubmit();
                 },
                 child: Text(
                   '了完',
@@ -268,10 +297,48 @@ class _EnterNamePageState extends State<EnterNamePage> {
       ),
       body: ListView(
         children: <Widget>[
-          TextField(decoration: InputDecoration(labelText: '名氏')),
+          TextField(
+            decoration: InputDecoration(labelText: '名氏'),
+            controller: nameEditController,
+          ),
           TextField(decoration: InputDecoration(labelText: 'カナ')),
         ],
       ),
     );
   }
+}
+
+class UserInfo {
+  final String name;
+
+  UserInfo({
+    required this.name,
+  });
+
+  static UserInfo fromJson(dynamic json) {
+    return UserInfo(name: json["name"]);
+  }
+
+  Map<String, dynamic> toJson() => {'name': name};
+}
+
+class Response {
+  final String success;
+  final String message;
+  final UserInfo data;
+
+  Response({required this.success, required this.message, required this.data});
+
+  static Response fromJson(dynamic json) {
+    return Response(
+        success: json['success'],
+        message: json['message'],
+        data: UserInfo.fromJson('data'));
+  }
+
+  Map<String, dynamic> toJson() => {
+        'success': success,
+        'message': message,
+        'data': data.toJson(),
+      };
 }
